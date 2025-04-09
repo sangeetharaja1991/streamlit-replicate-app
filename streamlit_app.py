@@ -24,13 +24,58 @@ with st.sidebar:
     if model == "google-deepmind/gemma-2b-it":
         model = "google-deepmind/gemma-2b-it:dff94eaf770e1fc211e425a50b51baa8e4cac6c39ef074681f9e39d778773626"
     
-    temperature = st.sidebar.slider('temperature', min_value=0.01, max_value=5.0, value=0.7, step=0.01, help="Randomness of generated output")
-    if temperature >= 1:
-        st.warning('Values exceeding 1 produces more creative and random output as well as increased likelihood of hallucination.')
-    if temperature < 0.1:
-        st.warning('Values approaching 0 produces deterministic output. Recommended starting value is 0.7')
-    
-    top_p = st.sidebar.slider('top_p', min_value=0.01, max_value=1.0, value=0.9, step=0.01, help="Top p percentage of most likely tokens for output generation")
+ # Load FAQ data from a JSON file
+faq_data = [
+    {
+        "question": "What is a script issue and how can it be identified?",
+        "answer": "A script issue occurs when there is consistent failure. If one build fails while others pass, it is likely an intermittent issue. Changes in script functionality indicate a Jenkins issue."
+    },
+    {
+        "question": "What does it mean if the cluster page is not loaded and no details are fetched?",
+        "answer": "If the cluster page is not loaded and no details are fetched, it is a product issue (web-related)."
+    },
+    {
+        "question": "What are the types of issues faced in Gateway Monitoring?",
+        "answer": "Issues include: intermittent or timeout issues, assertion errors, elements not found, and backend or script-related problems."
+    },
+    {
+        "question": "What is an intermittent or timeout issue?",
+        "answer": "Intermittent or timeout issues occur due to delays in backend responses. Logs may show timeouts, assertion errors, or mismatched values."
+    },
+    {
+        "question": "What do I do if the failure happens inconsistently?",
+        "answer": "If failures happen inconsistently across runs without script or environment changes, delays in backend responses may be the cause. Debug by checking the backend for high server load, database latency, or network delays."
+    },
+    {
+        "question": "How can I debug intermittent failures?",
+        "answer": "Manually check if it works. Retrigger the cases to see if they pass. Ensure the service is operational. If failures persist across builds, it may be a script issue."
+    },
+    {
+        "question": "What does a backend issue or timing issue mean?",
+        "answer": "Backend issues involve missing or delayed data from the server. Timing issues occur when the script tries to access data before it is available due to asynchronous behavior."
+    },
+    {
+        "question": "How can I debug backend or timing issues?",
+        "answer": "Manually verify the failure. Check the script and retest if necessary. If failures persist consistently across builds, it points to a script issue."
+    },
+    {
+        "question": "What is an assertion error and how can it be resolved?",
+        "answer": "An assertion error occurs when expected and actual values do not match. Debug by reviewing failed test cases, ensuring test logic aligns with expected behavior, and checking the code for potential issues. Rerun the test after debugging."
+    },
+    {
+        "question": "What is a script issue with a missing csrftoken.json file?",
+        "answer": "A script issue arises if the csrftoken.json file is missing or inaccessible. This file is essential for authentication (e.g., CSRF token)."
+    },
+    {
+        "question": "How do I debug missing csrftoken.json file issues?",
+        "answer": "Check the specified path (/app/testcases/ui/) to verify the file exists. Ensure it contains valid data. If missing or invalid, regenerate the file."
+    },
+    {
+        "question": "What to do if devices are offline and all test cases fail?",
+        "answer": "Step 1: Check the device in the Classic Central page to confirm if the gateway is online. Step 2: Verify the license or subscription for the device. Step 3: Check the device inventory to ensure it is assigned to Central."
+    }
+]
+
 
 # Store LLM-generated responses
 if "messages" not in st.session_state.keys():
